@@ -1,16 +1,40 @@
 import sys
-
+import pandas as pd
+import sqlalchemy
 
 def load_data(messages_filepath, categories_filepath):
-    pass
-
+    messages = pd.read_csv(messages_filepath)
+    categories = pd.read_csv(categories_filepath)
+    df = pd.merge(messages, categories, on="id")
+    return df
 
 def clean_data(df):
-    pass
+    categories = df.categories.str.split(pat = ';' , expand=True)
+    row = categories.iloc[0]
+    row = row.str.replace('\d+', '')
+    row = row.str.replace('-', '')
+    category_colnames = row
+    categories.rename(columns = category_colnames, inplace=True)
+    categories.columns = category_colnames
+
+    for column in categories:
+        # set each value to be the last character of the string
+        categories[column] = categories[column].astype(str)
+        # convert column from string to numeric
+        categories[column] = categories[column].str.strip().str[-1]
+        categories[column] = categories[column].astype(int)
+
+    df.drop(['categories'], axis = 1, inplace = True)
+    df = df.merge(categories, left_index=True, right_index=True)
+#     #duplicate = df[df.duplicated()]
+    df = df.drop_duplicates()
+    
+    return df
 
 
-def save_data(df, database_filename):
-    pass  
+def save_data(df, database_filepath):
+    engine = sqlalchemy.create_engine('sqlite:///{}'.format(database_filepath))
+    df.to_sql('disaster_msgs', engine, index=False, if_exists = 'replace')  
 
 
 def main():
