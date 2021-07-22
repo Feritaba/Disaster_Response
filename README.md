@@ -13,4 +13,4 @@
 
 3. Go to http://0.0.0.0:3001/
 
-4. You can install all the requierd libraries listed in file 'req.txt'.
+4. You can install all the requierd libraries listed in the 'req.txt'.
