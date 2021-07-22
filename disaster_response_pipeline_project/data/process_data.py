@@ -23,10 +23,13 @@ def clean_data(df):
         # convert column from string to numeric
         categories[column] = categories[column].str.strip().str[-1]
         categories[column] = categories[column].astype(int)
-
+        
+    indexNames = categories[categories['related'] == 2 ].index
+    categories.drop(indexNames , inplace=True)
+    
     df.drop(['categories'], axis = 1, inplace = True)
     df = df.merge(categories, left_index=True, right_index=True)
-#     #duplicate = df[df.duplicated()]
+    #duplicate = df[df.duplicated()]
     df = df.drop_duplicates()
     
     return df
